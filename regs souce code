@@ -1,0 +1,34 @@
+library ieee ;
+use ieee . std_logic_1164 . all ;
+use ieee . numeric_std . all ;
+entity regs is port (
+ clk , en , rst : in std_logic ;
+ id1 , id2 : in std_logic_vector ( 4 downto 0);
+ wr_en1 , wr_en2 : in std_logic ;
+ din1 , din2 : in std_logic_vector (15 downto 0);
+ dout1 , dout2 : out std_logic_vector (15 downto 0));
+end regs;
+architecture rtl of regs is
+ type regis is array ( 31 downto 0 ) of std_logic_vector ( 15 downto 0 ) ;
+ signal regist : regis := ( others =>( others => '0' )) ;
+begin
+ dout1 <= regist ( to_integer ( unsigned ( id1 ))) ;
+ dout2 <= regist ( to_integer ( unsigned ( id2 ))) ;
+ process(clk)
+ begin
+ if rst = '1' then
+ regist <= (others => (others => '0'));
+ if (rising_edge(clk)) then
+ if (en = '1') then
+ regist (0) <= (others => '0');
+ if (wr_en1 = '1') then
+ regist (to_integer (unsigned (id1))) <= din1 ;
+ end if ;
+ if (wr_en2 = '1') then
+ regist (to_integer (unsigned (id2))) <= din2 ;
+ end if ;
+ end if;
+ end if ;
+ end if ;
+ end process ;
+end rtl;
