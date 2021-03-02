@@ -1,0 +1,72 @@
+my_alu SOURCE CODE
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_logic_unsigned.all;
+use IEEE.NUMERIC_STD.ALL;
+entity my_alu is
+ Port (A, B : in std_logic_vector(15 downto 0);
+ en: std_logic;
+ opcode: in std_logic_vector(3 downto 0);
+ alu_out: out std_logic_vector(15 downto 0));
+end my_alu;
+architecture Behavioral of my_alu is
+begin
+ process(opcode)
+ begin
+ case opcode is
+ when "0000" =>
+ alu_out <= std_logic_vector(unsigned(A) + unsigned(B));
+ when "0001" =>
+ alu_out <= std_logic_vector(unsigned(A) - unsigned(B));
+ when "0010" =>
+ alu_out <= std_logic_vector(unsigned(A) + 1);
+ when "0011" =>
+ alu_out <= std_logic_vector(unsigned(A) - 1);
+ when "0100" =>
+ alu_out <= std_logic_vector(0 - unsigned(A));
+ when "0101" =>
+ alu_out <= A(14 downto 0) & '0';
+ when "0110" =>
+ alu_out <= '0' & A(15 downto 1);
+ when "0111" =>
+ alu_out <= A(15) & A(15 downto 1);
+ when "1000" =>
+ alu_out <= a and b;
+ when "1001" =>
+ alu_out <= a or b;
+ when "1010" =>
+ alu_out <= a xor b;
+ when "1011" =>
+ if (signed(A) < signed(B)) then
+ alu_out(0) <= '1';
+ else
+ alu_out(0) <= '0';
+ end if;
+ when "1100" =>
+ if (signed(A) > signed(B)) then
+ alu_out(0) <= '1';
+ else
+ alu_out(0) <= '0';
+ end if;
+ when "1101" =>
+ if (A = B) then
+ alu_out(0) <= '1';
+ else
+ alu_out(0) <= '0';
+ end if;
+ when "1110" =>
+ if (unsigned(A) < unsigned(B)) then
+ alu_out(0) <= '1';
+ else
+ alu_out(0) <= '0';
+ end if;
+ when "1111" =>
+ if (unsigned(A) > unsigned(B)) then
+ alu_out(0) <= '1';
+ else
+ alu_out(0) <= '0';
+ end if;
+ when others =>
+ end case;
+end process;
+end Behavioral;
