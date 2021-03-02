@@ -1,0 +1,22 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+entity clk_div115200 is
+ Port (en : out STD_LOGIC;
+ clk : in STD_LOGIC);
+end clk_div115200;
+architecture Behavioral of clk_div115200 is
+signal counter : std_logic_vector(26 downto 0);
+begin
+process (clk)
+begin
+ if rising_edge(clk) then
+ if (unsigned(counter) < 124999999/115200) then
+ counter <= std_logic_vector(unsigned(counter) + 1);
+ en <= '0';
+ else
+ counter <= (others => '0');
+ en <= '1';
+ end if;
+ end if;
+end process;
