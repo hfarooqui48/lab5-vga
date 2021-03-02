@@ -1,0 +1,37 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+entity processor_tb is
+-- Port ( );
+end processor_tb;
+architecture Behavioral of processor_tb is
+component processor_1_wrapper is
+ port (
+ CTS : out STD_LOGIC;
+ RTS : out STD_LOGIC;
+ RXD : out STD_LOGIC;
+ TXD : in STD_LOGIC;
+ btn : in STD_LOGIC;
+ clk : in STD_LOGIC;
+ vga_b : out STD_LOGIC_VECTOR ( 4 downto 0 );
+ vga_g : out STD_LOGIC_VECTOR ( 5 downto 0 );
+ vga_hs : out STD_LOGIC;
+ vga_r : out STD_LOGIC_VECTOR ( 4 downto 0 );
+ vga_vs : out STD_LOGIC
+ );
+end component;
+signal clktb, btntb, TXDtb : std_logic := '0';
+begin
+ clk_gen_proc: process
+ begin
+ wait for 5 ns;
+ clktb <= '1';
+ wait for 5 ns;
+ clktb <= '0';
+ end process clk_gen_proc;
+u1: processor_1_wrapper
+port map(
+ TXD => TXDtb,
+ clk => clktb,
+ btn => btntb
+);
+end Behavioral;
