@@ -1,0 +1,23 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+entity clk_divider is
+ Port (en : out STD_LOGIC;
+ clk : in STD_LOGIC);
+end clk_divider;
+architecture Behavioral of clk_divider is
+signal counter : std_logic_vector(26 downto 0);
+begin
+process (clk)
+begin
+ if rising_edge(clk) then
+ if (unsigned(counter) < 124999999/25000000) then
+ counter <= std_logic_vector(unsigned(counter) + 1);
+ en <= '0';
+ else
+ counter <= (others => '0');
+ en <= '1';
+ end if;
+ end if;
+end process;
+end Behavioral;
