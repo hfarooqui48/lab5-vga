@@ -1,0 +1,41 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
+entity framebuffer is
+ Port (clk1 , en1 , en2 , rst , ld : in std_logic ;
+ addr1 , addr2 : in std_logic_vector ( 11 downto 0 ) ;
+ wr_en1 : in std_logic ;
+ din1 : in std_logic_vector ( 15 downto 0 ) ;
+ dout1 , dout2 : out std_logic_vector ( 15 downto 0 ) );
+end framebuffer;
+architecture Behavioral of framebuffer is
+signal rstCount : std_logic_vector(12 downto 0) := (others => '0');
+type reg is array ( 4095 downto 0 ) of std_logic_vector ( 15 downto 0 ) ;
+signal reg_type : reg := (others => (others => '0')) ;
+begin
+ process ( clk1 )
+ begin
+ if ( rising_edge ( clk1 )) then
+ if ( en1 = '1' ) then
+ if (rst = '1' ) then
+ rstCount <= "1000000000000";
+ end if;
+ if(unsigned(rstCount) > 0) then
+ reg_type(to_integer(unsigned(rstCount) - 1)) <= (others => '0');
+ rstCount <= std_logic_vector(unsigned(rstCount) - 1);
+ elsif (wr_en1 = '1') then
+ if (ld = '1') then
+ reg_type(to_integer(unsigned(addr1))) <= din1;
+ end if;
+ dout1 <= reg_type(to_integer(unsigned(addr1)));
+ end if;
+ end if;
+ end if;
+ end process;
+ process(clk1)
+ begin
+ if(rising_edge(clk1) and en2 = '1' and unsigned(rstCount) = 0) then
+ dout2 <= reg_type(to_integer(unsigned(addr2)));
+ end if;
+ end process;
+end Behavioral;
