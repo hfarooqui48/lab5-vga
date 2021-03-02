@@ -1,0 +1,51 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+use IEEE.std_logic_unsigned.all;
+entity vga_ctrl is
+ Port (clk, en: in std_logic;
+ hcount, vcount : out std_logic_vector (9 downto 0);
+ vid, hs, vs : out std_logic);
+end vga_ctrl;
+architecture Behavioral of vga_ctrl is
+signal hcounter, vcounter: std_logic_vector(9 downto 0);
+signal hsync, vsync, dis: std_logic;
+begin
+process (clk, en)
+begin
+ if clk='1' and clk'event then
+ if en='1' then
+ hcount <= hcounter;
+ vcount <= vcounter;
+ if (hcounter < "1100011111") then
+ hcounter <= hcounter + 1;
+ else
+ hcounter <= "0000000000";
+ end if;
+ if hcounter = "0000000000" then
+ if vcounter < "1000001100" then
+ vcounter <= vcounter + 1;
+ else
+ vcounter <= "0000000000";
+ end if;
+ end if;
+ if hcounter >= "1010010000" and hcounter <= "1011101111" then
+ hs <= '0';
+ else
+ hs <= '1';
+ end if;
+ if vcounter >= "0111101010" and vcounter <= "0111101011" then
+ vs <= '0';
+ else
+ vs <= '1';
+ end if;
+ if hcounter <= "1001111111" and vcounter <= "0111011111" then
+ vid <= '1';
+ else
+ vid <= '0';
+ end if;
+
+ end if;
+ end if;
+end process;
+end Behavioral;
