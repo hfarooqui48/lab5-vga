@@ -1,0 +1,61 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity uart_tx is
+ Port (clk, en, send, rst : in std_logic;
+ char : in std_logic_vector (7 downto 0);
+ ready : out std_logic;
+ tx : out std_logic );
+end uart_tx;
+architecture fsm of uart_tx is
+type state is (idle, start, data, stop);
+signal curr : state := idle;
+signal hf : std_logic_vector(7 downto 0) := (others => '0');
+signal count : std_logic_vector(2 downto 0) := (others => '0');
+signal sigready, sigtx : std_logic := '1';
+begin
+ ready <= sigready;
+ tx <= sigtx;
+ process(clk)
+ begin
+ if (rising_edge(clk)) then
+ if (rst = '1') then
+ curr <= idle;
+ count <= (others => '0');
+ hf <= (others => '0');
+ elsif en = '1' then
+ case curr is
+ when idle =>
+ if (send = '1') then
+ hf <= char;
+ curr <= start;
+ else
+ sigready <= '1';
+ sigtx <= '1';
+ end if;
+ when start =>
+ sigtx <= '0';
+ sigready <= '0';
+ curr <= data;
+ when data =>
+ if (unsigned(count) < 7) then
+ sigtx <= hf(to_integer(unsigned(count)));
+ count <= std_logic_vector(unsigned(count) + 1);
+ else
+ sigtx <= hf(to_integer(unsigned(count)));
+ curr <= stop;
+ end if;
+ when stop =>
+ sigtx <= '1';
+ sigready <= '1';
+ count <= (others => '0');
+ hf <= (others => '0');
+ curr <= idle;
+ when others =>
+ curr <= idle;
+ end case;
+ end if;
+ end if;
+ end process;
+end fsm;
